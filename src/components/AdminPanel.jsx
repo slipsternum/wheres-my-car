@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { ArrowLeft, User, Settings, Trash2, Truck, ChevronDown, Plus, Grid, Key, Link, Copy, Check, X } from 'lucide-react';
 import { CarSuvSvg } from './CarIcons';
 import { CAR_COMPONENTS } from './CarIcons';
@@ -180,9 +181,9 @@ const AdminPanel = ({ config, saveConfig, currentUser, saveUserIdentity, setView
     const [isAdminUnlocked, setIsAdminUnlocked] = useState(false);
     const [passwordInput, setPasswordInput] = useState('');
 
-    // Local View Settings (Grid)
+    // User-specific View Settings
     const [localGridCols, setLocalGridCols] = useState(() => {
-        // Default to 2, use currentUser for key
+        // Retrieve persisted grid preference or default to 2
         return parseInt(localStorage.getItem(`pt_grid_columns_${currentUser}`) || '2');
     });
 
@@ -209,7 +210,7 @@ const AdminPanel = ({ config, saveConfig, currentUser, saveUserIdentity, setView
             setIsAdminUnlocked(true);
             showNotification("Unlocked & Authenticated");
 
-            // Derive root key from password
+            // Generate session token
             const rootKey = btoa(adminPass);
             localStorage.setItem('pt_api_key', rootKey);
 
@@ -269,7 +270,12 @@ const AdminPanel = ({ config, saveConfig, currentUser, saveUserIdentity, setView
     };
 
     return (
-        <div className="flex flex-col h-full bg-slate-50">
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: 0.05 } }}
+            className="flex flex-col h-full bg-slate-50"
+        >
             <div className="flex items-center gap-3 mb-6 pt-6 px-6">
                 <button onClick={() => setView('dashboard')} className="p-2 -ml-2 text-slate-400">
                     <ArrowLeft />
@@ -490,7 +496,7 @@ const AdminPanel = ({ config, saveConfig, currentUser, saveUserIdentity, setView
                     {isAdminUnlocked ? 'Save All Changes' : 'Save Preferences'}
                 </button>
             </div>
-        </div>
+        </motion.div>
     );
 };
 

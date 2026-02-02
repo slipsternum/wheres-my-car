@@ -83,9 +83,8 @@ apiRouter.use((req, res, next) => {
     }
 });
 
-
 // Loading state simulation delay
-const DELAY_MS = parseInt(process.env.ARTIFICIAL_DELAY_MS) || 800; // Configurable delay
+const DELAY_MS = parseInt(process.env.ARTIFICIAL_DELAY_MS) || 500; // Configurable delay
 if (DELAY_MS > 0) {
     apiRouter.use(async (req, res, next) => {
         await new Promise(resolve => setTimeout(resolve, DELAY_MS));

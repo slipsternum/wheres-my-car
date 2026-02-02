@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { DEMO_MODE, DEFAULT_CONFIG } from './constants';
 import { apiFetch } from './services/api';
 import Dashboard from './components/Dashboard';
@@ -10,7 +11,6 @@ import Toast from './components/Toast';
 const App = () => {
   const [view, setView] = useState('dashboard');
   const [activeCarId, setActiveCarId] = useState(null);
-  // --- Initialization & Data Loading ---
   // Initialize from localStorage for instant render
   const [config, setConfig] = useState(() => {
     const saved = localStorage.getItem('pt_config');
@@ -42,7 +42,7 @@ const App = () => {
       setCurrentUser('Driver');
     }
 
-    // 2. Load Data
+    // Load Data
     loadData();
 
     // Auto-refresh every 2 seconds for live updates
@@ -61,7 +61,6 @@ const App = () => {
     if (!isBackground) setLoading(true);
 
     if (DEMO_MODE) {
-      // Simulate network delay for demo mode
 
       const savedConfig = localStorage.getItem('pt_config');
       const savedStatus = localStorage.getItem('pt_status');
@@ -122,7 +121,7 @@ const App = () => {
     if (!isBackground) setLoading(false);
   };
 
-  // --- Actions ---
+
 
   const saveConfig = async (newConfig) => {
     setConfig(newConfig);
@@ -182,7 +181,7 @@ const App = () => {
     setToastMsg(msg);
   };
 
-  // --- View Routing ---
+
 
   if (loading && !config) {
     return <div className="h-full flex items-center justify-center text-slate-400">Loading...</div>;
@@ -191,39 +190,44 @@ const App = () => {
   return (
     <div className="h-[100dvh] w-screen bg-slate-50 overflow-hidden overscroll-none font-sans text-slate-900 select-none fixed inset-0">
       <div className="mx-auto max-w-md h-full bg-white shadow-2xl overflow-hidden relative">
-        {view === 'dashboard' && (
-          <Dashboard
-            config={config}
-            parkingStatus={parkingStatus}
-            handleStartParking={handleStartParking}
-            currentUser={currentUser}
-            setView={setView}
-            loading={loading}
-          />
-        )}
+        <AnimatePresence mode="wait">
+          {view === 'dashboard' && (
+            <Dashboard
+              key="dashboard"
+              config={config}
+              parkingStatus={parkingStatus}
+              handleStartParking={handleStartParking}
+              currentUser={currentUser}
+              setView={setView}
+              loading={loading}
+            />
+          )}
 
-        {view === 'park' && (
-          <ParkInterface
-            config={config}
-            activeCarId={activeCarId}
-            updateParking={updateParking}
-            setView={setView}
-            currentUser={currentUser}
-          />
-        )}
+          {view === 'park' && (
+            <ParkInterface
+              key="park"
+              config={config}
+              activeCarId={activeCarId}
+              updateParking={updateParking}
+              setView={setView}
+              currentUser={currentUser}
+            />
+          )}
 
-        {view === 'admin' && (
-          <AdminPanel
-            config={config}
-            saveConfig={saveConfig}
-            currentUser={currentUser}
-            saveUserIdentity={saveUserIdentity}
-            setView={setView}
-            showNotification={showNotification}
-          />
-        )}
+          {view === 'admin' && (
+            <AdminPanel
+              key="admin"
+              config={config}
+              saveConfig={saveConfig}
+              currentUser={currentUser}
+              saveUserIdentity={saveUserIdentity}
+              setView={setView}
+              showNotification={showNotification}
+            />
+          )}
 
-        {view === 'success' && <SuccessView />}
+          {view === 'success' && <SuccessView key="success" />}
+        </AnimatePresence>
 
         <Toast message={toastMsg} onClose={() => setToastMsg('')} />
       </div>

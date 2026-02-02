@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Settings, User, Clock, MapPin } from 'lucide-react';
 import { CarSuvSvg } from './CarIcons';
 import { CAR_COMPONENTS } from './CarIcons';
@@ -7,7 +8,12 @@ import SkeletonField from './SkeletonField';
 
 const Dashboard = ({ config, parkingStatus, handleStartParking, currentUser, setView, loading }) => {
     return (
-        <div className="flex flex-col h-full pt-8 bg-slate-50">
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: 0.05 } }}
+            className="flex flex-col h-full pt-8 bg-slate-50"
+        >
 
             <div className="flex justify-between items-start px-6 mb-6">
                 <div>
@@ -24,7 +30,16 @@ const Dashboard = ({ config, parkingStatus, handleStartParking, currentUser, set
             </div>
 
 
-            <div className="flex-1 flex flex-col gap-5 px-6 pb-12 overflow-y-auto">
+            <motion.div
+                className="flex-1 flex flex-col gap-5 px-6 pb-12 overflow-y-auto"
+                initial="visible"
+                animate="visible"
+                exit="hidden"
+                variants={{
+                    visible: { transition: { staggerChildren: 0.05 } },
+                    hidden: { transition: { staggerChildren: 0.05, staggerDirection: -1 } }
+                }}
+            >
                 {config.cars.length === 0 && !loading && (
                     <div className="flex flex-col items-center justify-center mt-20 text-center animate-in fade-in zoom-in duration-500">
                         <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mb-6 text-slate-300">
@@ -48,12 +63,16 @@ const Dashboard = ({ config, parkingStatus, handleStartParking, currentUser, set
                     const CarIcon = CAR_COMPONENTS[car.iconType] || CarSuvSvg;
 
                     return (
-                        <div
+                        <motion.div
                             key={car.id}
+                            layoutId={`car-card-${car.id}`}
+                            variants={{
+                                visible: { y: 0, opacity: 1 },
+                                hidden: { y: 20, opacity: 0 }
+                            }}
                             onClick={() => handleStartParking(car.id)}
                             className="relative bg-white rounded-[2rem] shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-slate-100 overflow-hidden transition-all active:scale-[0.98] cursor-pointer group"
                         >
-                            {/* Status Indicator */}
                             <div
                                 className={`absolute left-0 top-0 bottom-0 w-1.5 ${!status ? 'bg-slate-200' : ''}`}
                                 style={status ? { backgroundColor: car.color } : {}}
@@ -62,7 +81,6 @@ const Dashboard = ({ config, parkingStatus, handleStartParking, currentUser, set
                             <div className="p-5 pl-7">
                                 <div className="flex flex-col gap-4">
                                     <div className="flex justify-between items-start">
-                                        {/* Left Side: Detail */}
                                         <div className="flex flex-col justify-center">
                                             <div className="w-24 h-16 -ml-3 mb-2" style={{ color: car.color }}>
                                                 <CarIcon className="w-full h-full drop-shadow-md" idPrefix={car.id} />
@@ -71,7 +89,6 @@ const Dashboard = ({ config, parkingStatus, handleStartParking, currentUser, set
 
                                         </div>
 
-                                        {/* Right Side: Location */}
                                         <div className="text-right mt-1">
                                             {status ? (
                                                 <>
@@ -96,7 +113,6 @@ const Dashboard = ({ config, parkingStatus, handleStartParking, currentUser, set
                                             )}
                                         </div>
                                     </div>
-                                    {/* Footer */}
                                     {status ? (
                                         <div className="flex items-center justify-between pt-3 border-t border-slate-50">
                                             <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
@@ -104,7 +120,6 @@ const Dashboard = ({ config, parkingStatus, handleStartParking, currentUser, set
                                                 {formatTime(status.timestamp)}
                                             </div>
 
-                                            {/* Driver Info */}
                                             <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
                                                 <User size={12} className="text-slate-300" />
                                                 <span>
@@ -127,11 +142,11 @@ const Dashboard = ({ config, parkingStatus, handleStartParking, currentUser, set
                                     )}
                                 </div>
                             </div>
-                        </div>
+                        </motion.div>
                     );
                 })}
-            </div >
-        </div >
+            </motion.div >
+        </motion.div >
     );
 };
 

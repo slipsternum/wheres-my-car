@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { CarSuvSvg } from './CarIcons';
 import { CAR_COMPONENTS } from './CarIcons';
@@ -73,9 +74,14 @@ const ParkInterface = ({ config, activeCarId, updateParking, setView, currentUse
     const celestial = getCelestialInfo(time);
 
     return (
-        <div className="flex flex-col h-full bg-slate-50">
+        <motion.div
+            className="flex flex-col h-full bg-slate-50"
+            initial="initial"
+            animate="animate"
+            exit="exit"
+        >
 
-            {/* Animation Styles */}
+            {/* Animation Definitions */}
             <style>{`
                 @keyframes reverse-park-linear {
                     0% {
@@ -95,7 +101,7 @@ const ParkInterface = ({ config, activeCarId, updateParking, setView, currentUse
                     100% { opacity: 0; }
                 }
                 .animate-reverse-linear {
-                    animation: reverse-park-linear 2s cubic-bezier(0.2, 0, 0.2, 1) forwards;
+                    animation: reverse-park-linear 1s cubic-bezier(0.2, 0, 0.2, 1) forwards;
                 }
                 .animate-headlights {
                     animation: headlights-toggle 4s steps(1) forwards;
@@ -107,8 +113,13 @@ const ParkInterface = ({ config, activeCarId, updateParking, setView, currentUse
                 .animate-idle { animation: suspension-idle 0.5s ease-in-out 8 forwards; }
             `}</style>
 
-            {/* Scene Container (35% Height) */}
-            <div className={`relative flex-none h-[35%] min-h-[260px] w-full overflow-hidden ${skyClass} transition-colors duration-1000`}>
+            {/* Scene Container (Sky & Road) */}
+            <motion.div
+                initial={{ y: -100, opacity: 0 }}
+                animate={{ y: 0, opacity: 1, transition: { type: "spring", stiffness: 180, damping: 25 } }}
+                exit={{ y: -100, opacity: 0 }}
+                className={`relative flex-none h-[35%] min-h-[260px] w-full overflow-hidden ${skyClass} transition-colors duration-1000`}
+            >
 
                 {/* Back Button (Overlay) */}
                 <button
@@ -139,29 +150,25 @@ const ParkInterface = ({ config, activeCarId, updateParking, setView, currentUse
                         style={{ left: celestial.left, bottom: celestial.bottom, transform: 'translateX(-50%)' }}
                     >
                         {celestial.isDay ? (
-                            // GEOMETRIC SUN (Sharp, "Low Poly" Style)
+                            // GEOMETRIC SUN
                             <div className="relative w-full h-full animate-[spin_40s_linear_infinite]">
                                 <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-md">
-                                    {/* Rays (Triangles) */}
                                     <g className="text-amber-300">
                                         {[...Array(8)].map((_, i) => (
                                             <polygon key={i} points="45,5 55,5 50,20" transform={`rotate(${i * 45} 50 50)`} fill="currentColor" />
                                         ))}
                                     </g>
-                                    {/* Core (Hexagon/Faceted Ball) */}
-                                    <path d="M50 25 L72 37 L72 63 L50 75 L28 63 L28 37 Z" fill="#fbbf24" stroke="#f59e0b" strokeWidth="2" /> {/* Main Hexagon */}
-                                    <path d="M50 25 L50 50 L72 63" fill="none" stroke="#fcd34d" strokeWidth="1" opacity="0.5" /> {/* Facet lines */}
+                                    <path d="M50 25 L72 37 L72 63 L50 75 L28 63 L28 37 Z" fill="#fbbf24" stroke="#f59e0b" strokeWidth="2" />
+                                    <path d="M50 25 L50 50 L72 63" fill="none" stroke="#fcd34d" strokeWidth="1" opacity="0.5" />
                                     <path d="M50 50 L28 63" fill="none" stroke="#fcd34d" strokeWidth="1" opacity="0.5" />
                                 </svg>
                             </div>
                         ) : (
-                            // SHARP MOON (Recognizable Crescent)
+                            // SHARP MOON
                             <div className="relative w-full h-full">
                                 <svg viewBox="0 0 100 100" className="w-full h-full text-slate-100 drop-shadow-lg filter drop-shadow-white/20 overflow-visible">
                                     <g transform="translate(10, 10) scale(0.8)">
-                                        {/* Clear Crescent Shape */}
                                         <path d="M70 20 A 40 40 0 1 1 40 90 A 30 30 0 1 0 70 20 Z" fill="currentColor" />
-                                        {/* Craters (Subtle details) */}
                                         <circle cx="45" cy="50" r="3" fill="#cbd5e1" opacity="0.5" />
                                         <circle cx="55" cy="70" r="2" fill="#cbd5e1" opacity="0.5" />
                                     </g>
@@ -309,7 +316,7 @@ const ParkInterface = ({ config, activeCarId, updateParking, setView, currentUse
                     </div>
                 </div>
 
-                {/* Foreground Sign */}
+                {/* Foreground Sign (Car Name) */}
                 <div className="absolute bottom-0 right-[1%] z-50 pointer-events-none origin-bottom">
                     <svg className="w-32 h-48 drop-shadow-2xl" viewBox="0 0 200 150" preserveAspectRatio="xMidYMax meet">
                         {/* Pole (Offset slightly right for perspective) */}
@@ -332,29 +339,40 @@ const ParkInterface = ({ config, activeCarId, updateParking, setView, currentUse
                         </g>
                     </svg>
                 </div>
-            </div>
+            </motion.div>
 
-            {/* BOTTOM 2/3: Bento Grid */}
+            {/* Parking Grid */}
             <div className="flex-1 overflow-y-auto p-4 pt-6 pb-12 scrollbar-hide">
-                <div
+                <motion.div
                     className="grid gap-3 pb-8"
                     style={{ gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))` }}
+                    variants={{
+                        animate: { transition: { staggerChildren: 0.01, delayChildren: 0.2 } },
+                        exit: { transition: { staggerChildren: 0.01, staggerDirection: -1 } }
+                    }}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
                 >
                     {spots.map((spot, idx) => (
-                        <button
+                        <motion.button
                             key={idx}
+                            variants={{
+                                initial: { y: 50, opacity: 0, scale: 0.8 },
+                                animate: { y: 0, opacity: 1, scale: 1, transition: { type: "spring", stiffness: 250, damping: 20 } },
+                                exit: { y: 20, opacity: 0, scale: 0.9 }
+                            }}
                             onClick={() => updateParking(car.id, spot.floor, spot.section)}
-                            className="bg-white rounded-3xl border-2 border-slate-100 shadow-sm aspect-[4/3] flex flex-col items-center justify-center active:scale-95 active:border-blue-500 active:bg-blue-50 transition-all hover:border-slate-300 group animate-in slide-in-from-bottom-4 duration-500 fill-mode-backwards"
-                            style={{ animationDelay: `${idx * 50}ms` }}
+                            className="bg-white rounded-3xl border-2 border-slate-100 shadow-sm aspect-[4/3] flex flex-col items-center justify-center active:scale-95 active:border-blue-500 active:bg-blue-50 transition-colors hover:border-slate-300 group"
                         >
                             <span className="text-5xl font-black text-slate-700 group-hover:text-blue-600 group-active:text-blue-700">
                                 {spot.label}
                             </span>
-                        </button>
+                        </motion.button>
                     ))}
-                </div>
+                </motion.div>
             </div>
-        </div>
+        </motion.div>
     );
 };
 

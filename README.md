@@ -22,7 +22,7 @@ A modern, family-friendly parking tracker application designed to help you and y
 
 ## 🛠️ Tech Stack
 
-- **Frontend:** React 19, Vite, Tailwind CSS 4, Lucide React
+- **Frontend:** React 19, Vite, Tailwind CSS 4, Lucide React, Framer Motion
 - **Backend:** Node.js, Express
 - **Storage:** JSON file-based persistence (backend mode) or LocalStorage (demo mode)
 
