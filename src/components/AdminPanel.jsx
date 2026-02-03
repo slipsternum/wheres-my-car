@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, User, Settings, Trash2, Truck, ChevronDown, Plus, Grid, Key, Link, Copy, Check, X } from 'lucide-react';
-import { CarSuvSvg } from './CarIcons';
+import { CarSuvSvg, CustomCarIcon } from './CarIcons';
 import { CAR_COMPONENTS } from './CarIcons';
 import { CAR_TYPES } from '../constants';
 import { apiFetch } from '../services/api';
@@ -181,6 +181,10 @@ const AdminPanel = ({ config, saveConfig, currentUser, saveUserIdentity, setView
     const [isAdminUnlocked, setIsAdminUnlocked] = useState(false);
     const [passwordInput, setPasswordInput] = useState('');
 
+    // Custom Icon State
+    const [newIconName, setNewIconName] = useState('');
+    const [newIconSvg, setNewIconSvg] = useState('');
+
     // User-specific View Settings
     const [localGridCols, setLocalGridCols] = useState(() => {
         // Retrieve persisted grid preference or default to 2
@@ -231,12 +235,36 @@ const AdminPanel = ({ config, saveConfig, currentUser, saveUserIdentity, setView
         const newCars = [...localConfig.cars];
         const currentType = newCars[idx].iconType || 'suv';
 
-        let typeIndex = CAR_TYPES.indexOf(currentType);
+        const customKeys = Object.keys(localConfig.customIcons || {});
+        const allTypes = [...CAR_TYPES, ...customKeys];
+
+        let typeIndex = allTypes.indexOf(currentType);
         if (typeIndex === -1) typeIndex = 0;
 
-        const nextType = CAR_TYPES[(typeIndex + 1) % CAR_TYPES.length];
+        const nextType = allTypes[(typeIndex + 1) % allTypes.length];
         newCars[idx].iconType = nextType;
         setLocalConfig({ ...localConfig, cars: newCars });
+    };
+
+    const addCustomIcon = () => {
+        if (!newIconName.trim() || !newIconSvg.trim()) return;
+        const safeName = newIconName.replace(/[^a-zA-Z0-9-_]/g, '');
+
+        const updatedCustomIcons = {
+            ...(localConfig.customIcons || {}),
+            [safeName]: newIconSvg
+        };
+
+        setLocalConfig({ ...localConfig, customIcons: updatedCustomIcons });
+        setNewIconName('');
+        setNewIconSvg('');
+        showNotification("Icon Added");
+    };
+
+    const deleteCustomIcon = (key) => {
+        const updated = { ...localConfig.customIcons };
+        delete updated[key];
+        setLocalConfig({ ...localConfig, customIcons: updated });
     };
 
     const incrementGrid = () => {
@@ -339,13 +367,21 @@ const AdminPanel = ({ config, saveConfig, currentUser, saveUserIdentity, setView
 
                                 <div className="space-y-6">
                                     {localConfig.cars.map((car, idx) => {
-                                        const CarIcon = CAR_COMPONENTS[car.iconType] || CarSuvSvg;
+                                        // Resolve Icon
+                                        let CarIcon = CAR_COMPONENTS[car.iconType];
+                                        let customSvg = null;
+                                        if (!CarIcon && localConfig.customIcons && localConfig.customIcons[car.iconType]) {
+                                            CarIcon = CustomCarIcon;
+                                            customSvg = localConfig.customIcons[car.iconType];
+                                        }
+                                        if (!CarIcon) CarIcon = CarSuvSvg;
+
                                         return (
                                             <div key={car.id} className="flex flex-col gap-3 pb-8 border-b border-slate-100 last:border-0 last:pb-0">
                                                 <div className="flex gap-3 items-center">
                                                     {/* Icon Preview */}
                                                     <div className="w-14 h-10 flex-none" style={{ color: car.color }}>
-                                                        <CarIcon className="w-full h-full" idPrefix={car.id} />
+                                                        <CarIcon className="w-full h-full" idPrefix={car.id} svgString={customSvg} />
                                                     </div>
                                                     {/* Name Input */}
                                                     <input
@@ -477,6 +513,56 @@ const AdminPanel = ({ config, saveConfig, currentUser, saveUserIdentity, setView
                                         defaultValue={localConfig.sections.join(', ')}
                                         onBlur={(e) => handleArrayInput('sections', e.target.value)}
                                     />
+                                </div>
+                            </section>
+
+                            {/* Custom Icons Library */}
+                            <section className="bg-white p-5 rounded-3xl shadow-sm border border-slate-100">
+                                <h3 className="font-bold text-slate-400 mb-4 text-xs uppercase tracking-wider">Custom Icons</h3>
+
+                                <div className="space-y-4 mb-6">
+                                    {Object.entries(localConfig.customIcons || {}).map(([key, svg]) => (
+                                        <div key={key} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-8 text-slate-600">
+                                                    <CustomCarIcon className="w-full h-full" svgString={svg} />
+                                                </div>
+                                                <span className="font-bold text-slate-700 text-sm">{key}</span>
+                                            </div>
+                                            <button
+                                                onClick={() => deleteCustomIcon(key)}
+                                                className="p-2 text-red-300 hover:text-red-500 rounded-lg"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
+                                    ))}
+                                    {(!localConfig.customIcons || Object.keys(localConfig.customIcons).length === 0) && (
+                                        <div className="text-center text-slate-300 text-xs italic py-2">No custom icons added.</div>
+                                    )}
+                                </div>
+
+                                <div className="space-y-3">
+                                    <input
+                                        type="text"
+                                        value={newIconName}
+                                        onChange={(e) => setNewIconName(e.target.value)}
+                                        placeholder="Icon Name (e.g. racecar)"
+                                        className="w-full bg-slate-50 border-none rounded-xl px-3 py-2 text-sm font-bold"
+                                    />
+                                    <textarea
+                                        value={newIconSvg}
+                                        onChange={(e) => setNewIconSvg(e.target.value)}
+                                        placeholder="Paste SVG Code <svg>...</svg>"
+                                        className="w-full bg-slate-50 border-none rounded-xl px-3 py-2 text-xs font-mono h-24"
+                                    />
+                                    <button
+                                        onClick={addCustomIcon}
+                                        disabled={!newIconName || !newIconSvg}
+                                        className="w-full bg-blue-50 text-blue-600 py-2 rounded-xl font-bold text-sm hover:bg-blue-100 disabled:opacity-50"
+                                    >
+                                        Add to Library
+                                    </button>
                                 </div>
                             </section>
 

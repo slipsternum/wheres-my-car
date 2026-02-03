@@ -283,3 +283,17 @@ export const CAR_COMPONENTS = {
     truck: CarTruckSvg,
     sport: CarSportSvg
 };
+
+export const CustomCarIcon = ({ className, style, svgString }) => {
+    if (!svgString) return null;
+
+    // sizing override: ensure SVG takes parent/wrapper size
+    // We add a class to the wrapper that targets the child SVG
+    return (
+        <div
+            className={`${className} custom-car-icon [&>svg]:w-full [&>svg]:h-full`}
+            style={{ ...style, display: 'flex', alignItems: 'center', justifyItems: 'center' }}
+            dangerouslySetInnerHTML={{ __html: svgString }}
+        />
+    );
+};

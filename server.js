@@ -145,7 +145,7 @@ apiRouter.get('/config', (req, res) => {
 });
 
 apiRouter.post('/config', (req, res) => {
-    const { cars, floors, sections, gridColumns } = req.body;
+    const { cars, floors, sections, gridColumns, customIcons } = req.body;
 
     // Basic validation
     if (!cars || !floors || !sections) {
@@ -154,7 +154,7 @@ apiRouter.post('/config', (req, res) => {
 
     const db = getDB();
     // Merge updates
-    db.config = { ...db.config, cars, floors, sections, gridColumns };
+    db.config = { ...db.config, cars, floors, sections, gridColumns, customIcons };
     saveDB(db);
     res.json({ success: true, config: db.config });
 });

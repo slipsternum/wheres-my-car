@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Settings, User, Clock, MapPin } from 'lucide-react';
-import { CarSuvSvg } from './CarIcons';
+import { CarSuvSvg, CustomCarIcon } from './CarIcons';
 import { CAR_COMPONENTS } from './CarIcons';
 import { formatTime } from '../utils/format';
 import SkeletonField from './SkeletonField';
@@ -60,7 +60,17 @@ const Dashboard = ({ config, parkingStatus, handleStartParking, currentUser, set
 
                 {config.cars.map(car => {
                     const status = parkingStatus[car.id];
-                    const CarIcon = CAR_COMPONENTS[car.iconType] || CarSuvSvg;
+
+                    // Icon Resolution (same as ParkInterface)
+                    let CarIcon = CAR_COMPONENTS[car.iconType];
+                    let customSvg = null;
+
+                    if (!CarIcon && config.customIcons && config.customIcons[car.iconType]) {
+                        CarIcon = CustomCarIcon;
+                        customSvg = config.customIcons[car.iconType];
+                    }
+
+                    if (!CarIcon) CarIcon = CarSuvSvg;
 
                     return (
                         <motion.div
@@ -83,7 +93,7 @@ const Dashboard = ({ config, parkingStatus, handleStartParking, currentUser, set
                                     <div className="flex justify-between items-start">
                                         <div className="flex flex-col justify-center">
                                             <div className="w-24 h-16 -ml-3 mb-2" style={{ color: car.color }}>
-                                                <CarIcon className="w-full h-full drop-shadow-md" idPrefix={car.id} />
+                                                <CarIcon className="w-full h-full drop-shadow-md" idPrefix={car.id} svgString={customSvg} />
                                             </div>
                                             <h3 className="text-2xl font-black text-slate-800 tracking-tight leading-none mb-2">{car.name}</h3>
 

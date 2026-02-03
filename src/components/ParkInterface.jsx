@@ -1,13 +1,25 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
-import { CarSuvSvg } from './CarIcons';
+import { CarSuvSvg, CustomCarIcon } from './CarIcons';
 import { CAR_COMPONENTS } from './CarIcons';
 
 const ParkInterface = ({ config, activeCarId, updateParking, setView, currentUser }) => {
     const car = config.cars.find(c => c.id === activeCarId) || config.cars[0];
-    const CarIcon = CAR_COMPONENTS[car.iconType] || CarSuvSvg;
-    // Read local grid preference, default to 2. User-specific.
+
+    // Icon Resolution
+    let CarIcon = CAR_COMPONENTS[car.iconType];
+    let customSvg = null;
+
+    if (!CarIcon && config.customIcons && config.customIcons[car.iconType]) {
+        CarIcon = CustomCarIcon;
+        customSvg = config.customIcons[car.iconType];
+    }
+
+    // Fallback
+    if (!CarIcon) CarIcon = CarSuvSvg;
+
+    // Grid preference from localStorage, user-specific
     const gridCols = parseInt(localStorage.getItem(`pt_grid_columns_${currentUser}`) || '2');
 
     const spots = [];
@@ -38,6 +50,10 @@ const ParkInterface = ({ config, activeCarId, updateParking, setView, currentUse
     };
 
     const skyClass = getSkyGradient(time);
+
+    // Headlights on during sunset (19:00) onwards until morning (6:00)
+    const hour = time.totalMinutes / 60;
+    const isNightTime = hour >= 19 || hour < 6;
 
     // Celestial Body Position Logic
     const getCelestialInfo = (t) => {
@@ -294,23 +310,25 @@ const ParkInterface = ({ config, activeCarId, updateParking, setView, currentUse
                 </svg>
 
                 {/* Car (On Road) */}
-                <div className="absolute bottom-1 left-1/2 -translate-x-1/2 z-20">
+                <div className="absolute bottom-1 left-1/2 -translate-x-1/2 z-[60]">
                     <div className="animate-reverse-linear relative">
                         {/* Shadow */}
-                        <div className="absolute bottom-2 left-4 right-4 h-4 bg-black blur-md opacity-60 rounded-[100%] z-0"></div>
+                        <div className="absolute bottom-8 left-0 right-0 h-3 bg-black blur-sm opacity-80 rounded-[100%] z-0"></div>
 
-                        {/* Single Trapezoid Headlight (Under Car) */}
-                        <div className="animate-headlights absolute top-[65%] -left-32 -translate-y-1/2 w-40 h-16 pointer-events-none mix-blend-plus-lighter origin-right -z-10">
-                            <div className="absolute inset-0 bg-gradient-to-l from-yellow-100/50 via-yellow-100/10 to-transparent"
-                                style={{ clipPath: 'polygon(100% 40%, 0% 0%, 0% 100%, 100% 60%)' }}></div>
-                        </div>
+                        {/* Single Trapezoid Headlight (Under Car) - Only at night */}
+                        {isNightTime && (
+                            <div className="animate-headlights absolute top-[55%] -left-32 -translate-y-1/2 w-36 h-12 pointer-events-none mix-blend-plus-lighter origin-right -z-10">
+                                <div className="absolute inset-0 bg-gradient-to-l from-yellow-100/50 via-yellow-100/10 to-transparent"
+                                    style={{ clipPath: 'polygon(100% 40%, 0% 0%, 0% 100%, 100% 60%)' }}></div>
+                            </div>
+                        )}
 
                         {/* Car Icon */}
                         <div className="w-56 h-36 relative z-20 animate-idle" style={{ color: car.color }}>
                             <CarIcon
                                 className="w-full h-full"
                                 idPrefix={car.id}
-                                style={{ filter: 'drop-shadow(0 20px 15px rgba(0,0,0,0.5)) drop-shadow(0 -2px 3px rgba(255,255,255,0.95)) brightness(1.05)' }}
+                                svgString={customSvg}
                             />
                         </div>
                     </div>

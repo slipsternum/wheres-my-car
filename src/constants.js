@@ -6,5 +6,6 @@ export const DEFAULT_CONFIG = {
     cars: [],
     floors: ['1', '2', '3'],
     sections: ['A', 'B'],
-    gridColumns: 2
+    gridColumns: 2,
+    customIcons: {}
 };
