@@ -4,7 +4,8 @@ A modern, family-friendly parking tracker application designed to help you and y
 
 ## ✨ Features
 
-- **Multi-Car Support:** Track multiple vehicles (SUV, Sedan, Hatchback, Truck, Sports Car) with custom names and colors.
+- **Multi-Car Support:** Track multiple vehicles with custom names and colors.
+- **Custom Car Icons:** Upload your own SVG icons with dynamic color support via `currentColor`.
 - **Visual Parking Grid:** Easy-to-use interface for selecting parking spots based on floors and sections (e.g., "Level 2, Section B").
 - **Live Status:** Real-time updates on car location, parking time, and the driver who parked it.
 - **User Identity & Magic Links:**
@@ -22,8 +23,8 @@ A modern, family-friendly parking tracker application designed to help you and y
 
 ## 🛠️ Tech Stack
 
-- **Frontend:** React 19, Vite, Tailwind CSS 4, Lucide React, Framer Motion
-- **Backend:** Node.js, Express
+- **Frontend:** React 19, Vite 7, Tailwind CSS 4, Lucide React, Framer Motion 12
+- **Backend:** Node.js, Express 5
 - **Storage:** JSON file-based persistence (backend mode) or LocalStorage (demo mode)
 
 ## 🚀 Getting Started
@@ -81,13 +82,11 @@ Create a `.env` file in the root directory to configure the application.
 # Frontend Config
 VITE_DEMO_MODE=false            # Set to 'true' to run without backend (LocalStorage only)
 VITE_ADMIN_PASSWORD=admin123    # Master password to unlock the Admin Panel
+VITE_APP_BASE_URL=/             # App base path (e.g. /wheres-my-car/) if sub-folder
 
-# Backend Config (Optional)
+# Backend Config
 PORT=3000                       # Server port
 DB_FILE=data/db.json            # Path to the JSON database file
-
-# Deployment Config (Optional)
-VITE_APP_BASE_URL=/             # App base path (e.g. /wheres-my-car/) if sub-folder
 ```
 
 ## 🔐 Security & Authentication

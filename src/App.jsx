@@ -72,7 +72,6 @@ const App = () => {
       const hasKey = !!localStorage.getItem('pt_api_key');
       if (!hasKey) {
         if (!isBackground) setLoading(false);
-        // console.log("Skipping loadData - No API Key");
         return;
       }
 
