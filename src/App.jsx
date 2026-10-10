@@ -21,6 +21,7 @@ const App = () => {
   const [currentUser, setCurrentUser] = useState('');
   const [loading, setLoading] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
+  const [celebrateSpot, setCelebrateSpot] = useState(null);
 
   useEffect(() => {
     // Capture Key & ID from URL immediately
@@ -159,6 +160,11 @@ const App = () => {
       });
     }
 
+    // Configs saved before bestSpot existed fall back to the default
+    const bestSpot = (config.bestSpot ?? DEFAULT_CONFIG.bestSpot).trim();
+    const isBestSpot = bestSpot !== '' && location.toUpperCase() === bestSpot.toUpperCase();
+    setCelebrateSpot(isBestSpot ? location : null);
+
     setView('success');
     setTimeout(() => {
       setView('dashboard');
@@ -168,7 +174,7 @@ const App = () => {
       } catch (e) {
         // Ignore history errors
       }
-    }, 1000);
+    }, isBestSpot ? 3500 : 1000);
   };
 
   const handleStartParking = (carId) => {
@@ -225,7 +231,7 @@ const App = () => {
             />
           )}
 
-          {view === 'success' && <SuccessView key="success" />}
+          {view === 'success' && <SuccessView key="success" celebrateSpot={celebrateSpot} />}
         </AnimatePresence>
 
         <Toast message={toastMsg} onClose={() => setToastMsg('')} />

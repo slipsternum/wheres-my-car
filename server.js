@@ -38,7 +38,8 @@ const getDB = () => {
                 cars: [],
                 floors: ['1', '2', '3'],
                 sections: ['A', 'B'],
-                gridColumns: 2
+                gridColumns: 2,
+                bestSpot: '1A'
             },
             status: {}
         };
@@ -145,7 +146,7 @@ apiRouter.get('/config', (req, res) => {
 });
 
 apiRouter.post('/config', (req, res) => {
-    const { cars, floors, sections, gridColumns, customIcons } = req.body;
+    const { cars, floors, sections, gridColumns, customIcons, bestSpot } = req.body;
 
     // Basic validation
     if (!cars || !floors || !sections) {
@@ -154,7 +155,7 @@ apiRouter.post('/config', (req, res) => {
 
     const db = getDB();
     // Merge updates
-    db.config = { ...db.config, cars, floors, sections, gridColumns, customIcons };
+    db.config = { ...db.config, cars, floors, sections, gridColumns, customIcons, bestSpot: bestSpot ?? db.config.bestSpot };
     saveDB(db);
     res.json({ success: true, config: db.config });
 });

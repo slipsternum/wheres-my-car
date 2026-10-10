@@ -7,6 +7,7 @@ A modern, family-friendly parking tracker application designed to help you and y
 - **Multi-Car Support:** Track multiple vehicles with custom names and colors.
 - **Custom Car Icons:** Upload your own SVG icons with dynamic color support via `currentColor`.
 - **Visual Parking Grid:** Easy-to-use interface for selecting parking spots based on floors and sections (e.g., "Level 2, Section B").
+- **Best Spot Celebration:** Park in the family's favourite spot (default `1A`, set in the Admin Panel) and get a medal, a "BEST SPOT" stamp and confetti instead of the usual confirmation.
 - **Live Status:** Real-time updates on car location, parking time, and the driver who parked it.
 - **User Identity & Magic Links:**
   - Secure, key-based access for family members.

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, User, Settings, Trash2, Truck, ChevronDown, Plus, Grid, Key, Link, Copy, Check, X } from 'lucide-react';
+import { ArrowLeft, User, Settings, Trash2, Truck, ChevronDown, Plus, Grid, Key, Link, Copy, Check, X, Trophy } from 'lucide-react';
 import { CarSuvSvg, CustomCarIcon } from './CarIcons';
 import { CAR_COMPONENTS } from './CarIcons';
-import { CAR_TYPES } from '../constants';
+import { CAR_TYPES, DEFAULT_CONFIG } from '../constants';
 import { apiFetch } from '../services/api';
 
 const DeleteButton = ({ onDelete }) => {
@@ -223,6 +223,11 @@ const AdminPanel = ({ config, saveConfig, currentUser, saveUserIdentity, setView
             showNotification("Incorrect Password");
         }
     };
+
+    const bestSpot = localConfig.bestSpot ?? DEFAULT_CONFIG.bestSpot;
+    const spotOptions = localConfig.floors.flatMap(floor => localConfig.sections.map(section => `${floor}${section}`));
+    // Keep a saved spot selectable even if the layout no longer contains it
+    if (bestSpot && !spotOptions.includes(bestSpot)) spotOptions.unshift(bestSpot);
 
     const handleArrayInput = (key, val) => {
         const arr = val.split(',').map(s => s.trim()).filter(s => s !== '');
@@ -513,6 +518,22 @@ const AdminPanel = ({ config, saveConfig, currentUser, saveUserIdentity, setView
                                         defaultValue={localConfig.sections.join(', ')}
                                         onBlur={(e) => handleArrayInput('sections', e.target.value)}
                                     />
+                                </div>
+                                <div className="mt-6">
+                                    <label className="flex items-center gap-2 text-xs font-semibold text-slate-300 mb-2">
+                                        <Trophy size={14} /> Best Spot
+                                    </label>
+                                    <select
+                                        className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-bold text-slate-800 focus:ring-2 focus:ring-blue-500"
+                                        value={bestSpot}
+                                        onChange={(e) => setLocalConfig({ ...localConfig, bestSpot: e.target.value })}
+                                    >
+                                        <option value="">Off</option>
+                                        {spotOptions.map(spot => (
+                                            <option key={spot} value={spot}>{spot}</option>
+                                        ))}
+                                    </select>
+                                    <p className="text-xs text-slate-400 mt-2">Parking here shows a congratulations screen.</p>
                                 </div>
                             </section>
 

@@ -7,5 +7,7 @@ export const DEFAULT_CONFIG = {
     floors: ['1', '2', '3'],
     sections: ['A', 'B'],
     gridColumns: 2,
-    customIcons: {}
+    customIcons: {},
+    // Parking here shows the congratulations screen. Empty string turns it off.
+    bestSpot: '1A'
 };
